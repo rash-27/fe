@@ -1,55 +1,30 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Web3 from "web3";
-import {Futures} from "./abis/Futures"
+import React from 'react';
+import Navbar from "./components/Navbar";
+import Graph from "./components/Graph";
+import BuySell from "./components/BuySell";
+import Header from './components/Header';
+import History from './components/History';
+import Orderbook from './components/OrderBook';
+
 function App() {
-  const [web3, setWeb3] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [futureContract, setFutureContract] = useState(null);
-  const futureContractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-  const [positions, setPositions] = useState(null);
-  const [marketPrice, setMarketPrice] = useState(null);
-  
-    useEffect(()=>{
-        if (window.ethereum) {
-            window.ethereum.request({ method: 'eth_requestAccounts' })
-                .then(() => {
-                    const web3Instance = new Web3(window.ethereum);
-                    console.log("web3 from app",web3Instance);
-                    setWeb3(web3Instance);
-                    web3Instance.eth.getAccounts()
-                    .then(accounts => {
-                        setAccount(accounts[0]);
-                        // Futures contract
-                        const futuresInstance = new web3Instance.eth.Contract(Futures, futureContractAddress);
-                        setFutureContract(futuresInstance);
-                    }).catch(err=>{
-                        console.log("error fetching accounts", err);
-                    })
-                })
-                .catch(err => {
-                    // Handle error if the user rejects the connection request
-                    console.error(err);
-                });
-        } else {
-            alert('Please install an another Ethereum wallet.');
-        }
-    },[])
-  const handleOnclick = async()=>{
-    const tmp = await futureContract.methods.getOHLCVQueue().call();
-    setPositions(tmp);
-  console.log("ohlc", tmp);
-    const mp = await futureContract.methods.currentMarketPrice().call();
-console.log("market price", mp)
-   // setMarketPrice(mp);
-  }
   return (
-  <div>
-  <button onClick={handleOnclick}>Get OHLC Queue</button>
-  </div>
-  )
+    <div className="flex flex-col min-h-screen bg-black text-white">
+      <Navbar />
+      <Header />
+      <div className="flex flex-grow flex-col lg:flex-row h-[calc(100vh-128px)] p-4 space-y-4 lg:space-y-0 lg:space-x-4 overflow-y-auto">
+        <div className="lg:w-7/12 flex flex-col space-y-4">
+          <Graph />
+        </div>
+        <div className="lg:w-1/4 w-full lg:flex lg:flex-col space-y-4 lg:space-y-0">
+          <Orderbook />
+        </div>
+        <div className="lg:w-1/4 w-full lg:flex lg:flex-col space-y-4 lg:space-y-0">
+          <BuySell />
+        </div>
+      </div>
+      <History />
+    </div>
+  );
 }
 
-export default App
+export default App;
