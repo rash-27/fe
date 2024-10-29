@@ -20,6 +20,7 @@ const Graph = () => {
             close: BigInt(item.close),
           }));
           setDataArray(formattedData);
+          console.log(formattedData)
         } catch (error) {
           console.error('Error fetching OHLC data:', error);
         }

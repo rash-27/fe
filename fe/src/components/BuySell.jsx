@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+
+import { MetaMaskContext } from '../MetaMaskContext';
 
 const BuySell = () => {
   const [leverage, setLeverage] = useState(1);
   const [size, setSize] = useState(0);
-  const [selectedAction, setSelectedAction] = useState("Buy");
+  const [selectedAction, setSelectedAction] = useState("Buy"); 
+  const { futureContract, account, tokenContract, futureContractAddress } = useContext(MetaMaskContext);
 
-  const handleExecute = () => {
+  const handleExecute = async() => {
+   try{
+    const balance = await tokenContract.methods.balanceOf(account).call();
+    console.log(balance.toString());
+    const approval = await tokenContract.methods.approve(futureContractAddress, size).send({from : account});
+    console.log("approval ", approval);
+    const res = await futureContract.methods.openPosition(leverage, size).send({from : account});
+    console.log("Buy function ", res);
+  }catch(err){
+    console.log(`Error while executing ${selectedAction}`, err);
+  } 
     console.log(`${selectedAction} futures with leverage: ${leverage}, size: ${size}`);
   };
 
